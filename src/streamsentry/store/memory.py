@@ -151,3 +151,15 @@ class MemoryStore:
                 (item for item in self._slos.values() if item.workspace_id == workspace_id),
                 key=lambda item: (item.status, item.name),
             )
+
+    def put_cost(self, signal: CostSignal) -> None:
+        with self._lock:
+            self._costs[signal.id] = signal
+
+    def list_costs(self, workspace_id: str) -> list[CostSignal]:
+        with self._lock:
+            return sorted(
+                (item for item in self._costs.values() if item.workspace_id == workspace_id),
+                key=lambda item: (item.period_end, item.amount_usd),
+                reverse=True,
+            )
