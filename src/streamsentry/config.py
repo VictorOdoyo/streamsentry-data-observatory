@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     host: str = "0.0.0.0"
     port: int = Field(default=8080, ge=1, le=65535)
     request_body_limit: int = Field(default=1_048_576, ge=1024)
-    database_url: str = "sqlite+aiosqlite:///./streamsentry.db"
+    database_url: str = "sqlite+pysqlite:///./streamsentry.db"
     cors_origins: tuple[str, ...] = ("http://localhost:5173",)
 
 
