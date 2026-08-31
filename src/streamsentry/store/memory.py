@@ -89,3 +89,15 @@ class MemoryStore:
                 (item for item in self._checks.values() if item.workspace_id == workspace_id),
                 key=lambda item: (item.dataset_id, item.name),
             )
+
+    def put_run(self, run: QualityRun) -> None:
+        with self._lock:
+            self._runs[run.id] = run
+
+    def list_runs(self, workspace_id: str) -> list[QualityRun]:
+        with self._lock:
+            return sorted(
+                (item for item in self._runs.values() if item.workspace_id == workspace_id),
+                key=lambda item: item.finished_at,
+                reverse=True,
+            )
