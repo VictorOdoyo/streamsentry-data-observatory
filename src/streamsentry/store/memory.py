@@ -71,3 +71,21 @@ class MemoryStore:
                 (item for item in self._datasets.values() if item.workspace_id == workspace_id),
                 key=lambda item: (item.tier, item.name),
             )
+
+    def put_check(self, check: QualityCheck) -> None:
+        with self._lock:
+            self._checks[check.id] = check
+
+    def get_check(self, workspace_id: str, check_id: str) -> QualityCheck:
+        with self._lock:
+            check = self._checks.get(check_id)
+            if check is None or check.workspace_id != workspace_id:
+                raise NotFoundError("quality check not found")
+            return check
+
+    def list_checks(self, workspace_id: str) -> list[QualityCheck]:
+        with self._lock:
+            return sorted(
+                (item for item in self._checks.values() if item.workspace_id == workspace_id),
+                key=lambda item: (item.dataset_id, item.name),
+            )
