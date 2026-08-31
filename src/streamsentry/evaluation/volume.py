@@ -17,5 +17,9 @@ def evaluate_volume(check: QualityCheck, observation: Observation) -> Evaluation
         observed_value=float(observation.row_count),
         expected_value=expected,
         message="row volume is within range" if passed else "row volume is outside range",
-        metrics={"row_count": observation.row_count, "minimum_rows": minimum, "maximum_rows": maximum},
+        metrics={
+            "row_count": observation.row_count,
+            "minimum_rows": minimum,
+            "maximum_rows": maximum,
+        },
     )

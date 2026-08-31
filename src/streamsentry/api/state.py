@@ -1,4 +1,7 @@
 from dataclasses import dataclass
+from typing import cast
+
+from fastapi import Request
 
 from streamsentry.domain.identity import IDFactory, RandomIDFactory, SystemClock
 from streamsentry.seed import load_demo_workspace
@@ -24,3 +27,7 @@ def build_state(ids: IDFactory | None = None) -> ApplicationState:
     services = build_services(context)
     workspace_id = load_demo_workspace(services)
     return ApplicationState(store=store, services=services, default_workspace_id=workspace_id)
+
+
+def get_state(request: Request) -> ApplicationState:
+    return cast(ApplicationState, request.app.state.container)

@@ -56,9 +56,7 @@ class IncidentService:
         self.context.store.put_incident(updated)
         return updated
 
-    def transition(
-        self, workspace_id: str, incident_id: str, status: IncidentStatus
-    ) -> Incident:
+    def transition(self, workspace_id: str, incident_id: str, status: IncidentStatus) -> Incident:
         current = self.context.store.get_incident(workspace_id, incident_id)
         if status not in TRANSITIONS[current.status]:
             raise InvalidTransitionError(f"cannot move incident from {current.status} to {status}")

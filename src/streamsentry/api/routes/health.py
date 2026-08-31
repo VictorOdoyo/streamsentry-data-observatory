@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Request
 
+from streamsentry.api.state import get_state
+
 router = APIRouter(tags=["health"])
 
 
@@ -12,5 +14,5 @@ def live() -> dict[str, str]:
 def ready(request: Request) -> dict[str, str]:
     return {
         "status": "ready",
-        "workspace_id": request.app.state.container.default_workspace_id,
+        "workspace_id": get_state(request).default_workspace_id,
     }

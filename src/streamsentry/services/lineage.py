@@ -42,7 +42,9 @@ class LineageService:
         while queue:
             current = queue.pop(0)
             for edge in edges:
-                if edge.upstream_dataset_id == current and edge.downstream_dataset_id not in visited:
+                is_upstream = edge.upstream_dataset_id == current
+                is_unvisited = edge.downstream_dataset_id not in visited
+                if is_upstream and is_unvisited:
                     visited.add(edge.downstream_dataset_id)
                     queue.append(edge.downstream_dataset_id)
         visited.discard(dataset_id)

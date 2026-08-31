@@ -31,7 +31,11 @@ class RunService:
         )
         self.context.store.put_run(run)
         if result.status != RunStatus.SKIPPED:
-            status = DatasetStatus.HEALTHY if result.status == RunStatus.PASSED else DatasetStatus.FAILING
+            status = (
+                DatasetStatus.HEALTHY
+                if result.status == RunStatus.PASSED
+                else DatasetStatus.FAILING
+            )
             self.context.store.put_dataset(
                 dataset.model_copy(
                     update={

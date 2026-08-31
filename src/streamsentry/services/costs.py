@@ -38,4 +38,5 @@ class CostService:
         return item
 
     def total(self, workspace_id: str) -> float:
-        return round(sum(item.amount_usd for item in self.context.store.list_costs(workspace_id)), 2)
+        costs = self.context.store.list_costs(workspace_id)
+        return round(sum(item.amount_usd for item in costs), 2)
