@@ -11,6 +11,8 @@ def test_health_and_observatory_reads(client: TestClient, state: ApplicationStat
     response = client.get("/health/live", headers={"X-Request-ID": "trace-42"})
     assert response.status_code == 200
     assert response.headers["X-Request-ID"] == "trace-42"
+    cors_response = client.get("/api/v1/workspaces", headers={"Origin": "http://127.0.0.1:5173"})
+    assert cors_response.headers["Access-Control-Allow-Origin"] == "http://127.0.0.1:5173"
     assert client.get("/health/ready").json()["workspace_id"] == state.default_workspace_id
     assert len(client.get("/api/v1/workspaces").json()) == 1
     path = workspace_path(state)
