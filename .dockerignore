@@ -1,0 +1,11 @@
+.git
+.github
+.venv
+.mypy_cache
+.pytest_cache
+.ruff_cache
+.coverage
+htmlcov
+web/node_modules
+web/dist
+tests
