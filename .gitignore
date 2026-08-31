@@ -10,9 +10,9 @@ htmlcov/
 .coverage
 coverage.xml
 *.py[cod]
-frontend/node_modules/
-frontend/dist/
-frontend/coverage/
-frontend/playwright-report/
-frontend/test-results/
+web/node_modules/
+web/dist/
+web/coverage/
+web/playwright-report/
+web/test-results/
 *.tsbuildinfo
