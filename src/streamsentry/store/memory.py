@@ -53,3 +53,21 @@ class MemoryStore:
                 (item for item in self._owners.values() if item.workspace_id == workspace_id),
                 key=lambda item: item.name,
             )
+
+    def put_dataset(self, dataset: Dataset) -> None:
+        with self._lock:
+            self._datasets[dataset.id] = dataset
+
+    def get_dataset(self, workspace_id: str, dataset_id: str) -> Dataset:
+        with self._lock:
+            dataset = self._datasets.get(dataset_id)
+            if dataset is None or dataset.workspace_id != workspace_id:
+                raise NotFoundError("dataset not found")
+            return dataset
+
+    def list_datasets(self, workspace_id: str) -> list[Dataset]:
+        with self._lock:
+            return sorted(
+                (item for item in self._datasets.values() if item.workspace_id == workspace_id),
+                key=lambda item: (item.tier, item.name),
+            )
