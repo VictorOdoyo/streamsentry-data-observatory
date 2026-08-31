@@ -1,122 +1,40 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
+import { AlertCircle, LoaderCircle, RefreshCw } from 'lucide-react'
+import { useState, type ReactNode } from 'react'
+
 import './App.css'
+import { AppShell } from './components/AppShell'
+import { useObservatoryData } from './hooks/useObservatoryData'
+import type { ViewKey } from './types'
+import { DatasetsView } from './views/DatasetsView'
+import { IncidentsView } from './views/IncidentsView'
+import { LineageView } from './views/LineageView'
+import { OverviewView } from './views/OverviewView'
+import { QualityView } from './views/QualityView'
+import { ReliabilityView } from './views/ReliabilityView'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [activeView, setActiveView] = useState<ViewKey>('overview')
+  const state = useObservatoryData()
 
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+  if (state.status === 'loading') {
+    return <main className="state-page"><LoaderCircle className="spin" /><h1>Loading observatory</h1><p>Collecting the latest quality and reliability signals.</p></main>
+  }
 
-      <div className="ticks"></div>
+  if (state.status === 'error') {
+    return <main className="state-page"><AlertCircle /><h1>Unable to reach StreamSentry</h1><p>{state.error}</p><button className="primary-button" onClick={state.refresh}><RefreshCw size={17} />Try again</button></main>
+  }
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+  const data = state.data
+  const views: Record<ViewKey, ReactNode> = {
+    overview: <OverviewView data={data} onOpenIncidents={() => setActiveView('incidents')} />,
+    datasets: <DatasetsView data={data} />,
+    quality: <QualityView data={data} />,
+    incidents: <IncidentsView data={data} />,
+    lineage: <LineageView data={data} />,
+    reliability: <ReliabilityView data={data} />,
+  }
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+  return <AppShell activeView={activeView} workspaceName={data.workspace.name} onNavigate={setActiveView} onRefresh={state.refresh}>{views[activeView]}</AppShell>
 }
 
 export default App
