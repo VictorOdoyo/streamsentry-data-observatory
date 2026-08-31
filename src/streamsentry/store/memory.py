@@ -120,3 +120,16 @@ class MemoryStore:
                 key=lambda item: item.updated_at,
                 reverse=True,
             )
+
+    def put_lineage(self, edge: LineageEdge) -> None:
+        with self._lock:
+            if edge.upstream_dataset_id == edge.downstream_dataset_id:
+                raise ConflictError("lineage self-reference is not allowed")
+            self._lineage[edge.id] = edge
+
+    def list_lineage(self, workspace_id: str) -> list[LineageEdge]:
+        with self._lock:
+            return sorted(
+                (item for item in self._lineage.values() if item.workspace_id == workspace_id),
+                key=lambda item: (item.upstream_dataset_id, item.downstream_dataset_id),
+            )
