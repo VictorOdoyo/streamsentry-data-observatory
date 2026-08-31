@@ -133,3 +133,21 @@ class MemoryStore:
                 (item for item in self._lineage.values() if item.workspace_id == workspace_id),
                 key=lambda item: (item.upstream_dataset_id, item.downstream_dataset_id),
             )
+
+    def put_slo(self, slo: ServiceLevelObjective) -> None:
+        with self._lock:
+            self._slos[slo.id] = slo
+
+    def get_slo(self, workspace_id: str, slo_id: str) -> ServiceLevelObjective:
+        with self._lock:
+            slo = self._slos.get(slo_id)
+            if slo is None or slo.workspace_id != workspace_id:
+                raise NotFoundError("service level objective not found")
+            return slo
+
+    def list_slos(self, workspace_id: str) -> list[ServiceLevelObjective]:
+        with self._lock:
+            return sorted(
+                (item for item in self._slos.values() if item.workspace_id == workspace_id),
+                key=lambda item: (item.status, item.name),
+            )
