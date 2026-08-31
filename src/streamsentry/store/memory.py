@@ -101,3 +101,22 @@ class MemoryStore:
                 key=lambda item: item.finished_at,
                 reverse=True,
             )
+
+    def put_incident(self, incident: Incident) -> None:
+        with self._lock:
+            self._incidents[incident.id] = incident
+
+    def get_incident(self, workspace_id: str, incident_id: str) -> Incident:
+        with self._lock:
+            incident = self._incidents.get(incident_id)
+            if incident is None or incident.workspace_id != workspace_id:
+                raise NotFoundError("incident not found")
+            return incident
+
+    def list_incidents(self, workspace_id: str) -> list[Incident]:
+        with self._lock:
+            return sorted(
+                (item for item in self._incidents.values() if item.workspace_id == workspace_id),
+                key=lambda item: item.updated_at,
+                reverse=True,
+            )
